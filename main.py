@@ -20,3 +20,4 @@ active_accounts = []
 for account in all_accounts.accounts:
     print(dumps(account.to_dict(), indent=2))
     # refer to account_sample.json for sample output
+    # difference between account.hold vs account.available_balance: account.hold refers to staked asset, while account.available_balance refers to amount available for trading or selling
