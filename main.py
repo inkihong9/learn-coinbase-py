@@ -1,13 +1,22 @@
 # https://github.com/coinbase/coinbase-python
 
 import os
-import json
 
-from coinbase.wallet.client import Client
+from coinbase.rest import RESTClient
 
-coinbase_api_key = os.getenv('COINBASE_API_KEY', 'my api key')
-coinbase_api_secret = os.getenv('COINBASE_API_SECRET', 'my api secret')
-client = Client(coinbase_api_key, coinbase_api_secret)
+from json import dumps
 
-user = client.get_current_user()
-# user_as_json_string = json.dumps(user)
+
+coinbase_api_key = os.getenv('COINBASE_API_KEY')
+coinbase_api_secret = os.getenv('COINBASE_API_SECRET')
+
+client = RESTClient(coinbase_api_key, coinbase_api_secret)
+
+all_accounts = client.get_accounts()
+active_accounts = []
+
+
+
+for account in all_accounts.accounts:
+    print(dumps(account.to_dict(), indent=2))
+    # refer to account_sample.json for sample output
