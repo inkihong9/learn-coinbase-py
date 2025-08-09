@@ -15,7 +15,11 @@ client = RESTClient(coinbase_api_key, coinbase_api_secret)
 all_accounts = client.get_accounts()
 active_accounts = []
 
-
+all_orders = client.list_orders()
+for order in all_orders.orders:
+    print(dumps(order.to_dict(), indent=2))
+    # refer to order_sample.json for sample output
+    
 
 for account in all_accounts.accounts:
     print(dumps(account.to_dict(), indent=2))
