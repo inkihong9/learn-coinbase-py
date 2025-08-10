@@ -1,14 +1,19 @@
 # https://github.com/coinbase/coinbase-python
 
-import os
+import os, logging
 
 from coinbase.rest import RESTClient
 
 from json import dumps
 
+from models import Account
+
 
 coinbase_api_key = os.getenv('COINBASE_API_KEY')
 coinbase_api_secret = os.getenv('COINBASE_API_SECRET')
+
+if not coinbase_api_key or not coinbase_api_secret:
+    raise EnvironmentError("Please set the COINBASE_API_KEY and COINBASE_API_SECRET environment variables.")
 
 client = RESTClient(coinbase_api_key, coinbase_api_secret)
 
@@ -22,6 +27,11 @@ for order in all_orders.orders:
     
 
 for account in all_accounts.accounts:
-    print(dumps(account.to_dict(), indent=2))
+    acct = Account.from_dict(account.to_dict())
+    if acct.available_balance > 0 or acct.hold > 0:
+        active_accounts.append(acct)
+        logging.info(acct)
+
+    # print(dumps(account.to_dict(), indent=2))
     # refer to account_sample.json for sample output
     # difference between account.hold vs account.available_balance: account.hold refers to staked asset, while account.available_balance refers to amount available for trading or selling
