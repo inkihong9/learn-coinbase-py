@@ -4,9 +4,9 @@ import os, logging
 
 from coinbase.rest import RESTClient
 
-from json import dumps
+from models import Account, Order
 
-from models import Account
+logging.basicConfig(level=logging.INFO)
 
 
 coinbase_api_key = os.getenv('COINBASE_API_KEY')
@@ -21,8 +21,12 @@ all_accounts = client.get_accounts()
 active_accounts = []
 
 all_orders = client.list_orders()
+active_orders = []
+
 for order in all_orders.orders:
-    print(dumps(order.to_dict(), indent=2))
+    o = Order.from_dict(order.to_dict())
+    active_orders.append(o)
+    logging.info(o)
     # refer to order_sample.json for sample output
     
 
@@ -34,4 +38,5 @@ for account in all_accounts.accounts:
 
     # print(dumps(account.to_dict(), indent=2))
     # refer to account_sample.json for sample output
-    # difference between account.hold vs account.available_balance: account.hold refers to staked asset, while account.available_balance refers to amount available for trading or selling
+    # difference between account.hold vs account.available_balance: account.hold refers to staked asset, 
+    # while account.available_balance refers to amount available for trading or selling
