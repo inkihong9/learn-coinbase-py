@@ -4,6 +4,7 @@ import os, logging
 
 from coinbase.rest import RESTClient
 
+
 from models import Account, Order
 
 logging.basicConfig(level=logging.INFO)
@@ -12,15 +13,19 @@ logging.basicConfig(level=logging.INFO)
 coinbase_api_key = os.getenv('COINBASE_API_KEY')
 coinbase_api_secret = os.getenv('COINBASE_API_SECRET')
 
+
+
 if not coinbase_api_key or not coinbase_api_secret:
     raise EnvironmentError("Please set the COINBASE_API_KEY and COINBASE_API_SECRET environment variables.")
 
-client = RESTClient(coinbase_api_key, coinbase_api_secret)
+rest_client = RESTClient(coinbase_api_key, coinbase_api_secret)
 
-all_accounts = client.get_accounts()
+rest_client.buy
+
+all_accounts = rest_client.get_accounts()
 active_accounts = []
 
-all_orders = client.list_orders()
+all_orders = rest_client.list_orders()
 active_orders = []
 
 for order in all_orders.orders:
