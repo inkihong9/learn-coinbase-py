@@ -20,8 +20,6 @@ if not coinbase_api_key or not coinbase_api_secret:
 
 rest_client = RESTClient(coinbase_api_key, coinbase_api_secret)
 
-rest_client.buy
-
 all_accounts = rest_client.get_accounts()
 active_accounts = []
 
