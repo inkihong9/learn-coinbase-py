@@ -10,13 +10,13 @@ from coinbase.rest import RESTClient
 logging.basicConfig(level=logging.INFO)
 
 
-coinbase_api_key = os.getenv("COINBASE_API_KEY")
-coinbase_api_secret = os.getenv("COINBASE_API_SECRET")
+coinbase_api_key = os.getenv('COINBASE_API_KEY')
+coinbase_api_secret = os.getenv('COINBASE_API_SECRET')
 
 
 
 if not coinbase_api_key or not coinbase_api_secret:
-    raise EnvironmentError("Please set the COINBASE_API_KEY and COINBASE_API_SECRET environment variables.")
+    raise EnvironmentError('Please set the COINBASE_API_KEY and COINBASE_API_SECRET environment variables.')
 
 rest_client = RESTClient(coinbase_api_key, coinbase_api_secret)
 
@@ -28,12 +28,12 @@ all_orders = rest_client.list_orders()
 
 non_cancelled_orders = [
     o for o in all_orders.orders 
-    if o.status != "CANCELLED"
+    if o.status != 'CANCELLED'
 ]
 
 non_empty_accounts = [
     a for a in all_accounts.accounts 
-    if float(a.available_balance["value"]) > 0 or float(a.hold["value"]) > 0
+    if float(a.available_balance['value']) > 0 or float(a.hold['value']) > 0
 ]
 
 for order in non_cancelled_orders:
