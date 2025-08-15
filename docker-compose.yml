@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  learn-coinbase-2:
+    build: .
+    container_name: learn-coinbase-2
+    environment:
+      - KEY=value
+    volumes:
+      - .:/app
+    tty: true
+    stdin_open: true
