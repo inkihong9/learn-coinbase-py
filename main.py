@@ -5,13 +5,13 @@ import os, logging
 from coinbase.rest import RESTClient
 
 
-from models import Account, Order
+# from models import Account
 
 logging.basicConfig(level=logging.INFO)
 
 
-coinbase_api_key = os.getenv('COINBASE_API_KEY')
-coinbase_api_secret = os.getenv('COINBASE_API_SECRET')
+coinbase_api_key = os.getenv("COINBASE_API_KEY")
+coinbase_api_secret = os.getenv("COINBASE_API_SECRET")
 
 
 
@@ -21,23 +21,30 @@ if not coinbase_api_key or not coinbase_api_secret:
 rest_client = RESTClient(coinbase_api_key, coinbase_api_secret)
 
 all_accounts = rest_client.get_accounts()
-active_accounts = []
+# active_accounts = []
 
 all_orders = rest_client.list_orders()
-active_orders = []
+# active_orders = []
 
-for order in all_orders.orders:
-    o = Order.from_dict(order.to_dict())
-    active_orders.append(o)
-    logging.info(o)
+non_cancelled_orders = [
+    o for o in all_orders.orders 
+    if o.status != "CANCELLED"
+]
+
+non_empty_accounts = [
+    a for a in all_accounts.accounts 
+    if float(a.available_balance["value"]) > 0 or float(a.hold["value"]) > 0
+]
+
+for order in non_cancelled_orders:
+    # o = Order.from_dict(order.to_dict())
+    # active_orders.append(o)
+    logging.info(order)
     # refer to order_sample.json for sample output
     
 
-for account in all_accounts.accounts:
-    acct = Account.from_dict(account.to_dict())
-    if acct.available_balance > 0 or acct.hold > 0:
-        active_accounts.append(acct)
-        logging.info(acct)
+for account in non_empty_accounts:
+    logging.info(account)
 
     # print(dumps(account.to_dict(), indent=2))
     # refer to account_sample.json for sample output
