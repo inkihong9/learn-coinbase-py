@@ -1,22 +1,331 @@
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from coinbase.rest.types.orders_types import Order
 import uuid
 
 
 class RecordType(Enum):
+    NONE = "NONE"
     BUY = "BUY"
     SELL = "SELL"
     INVEST = "INVEST"
 
 
-class AssetType(Enum):
-    CRO = "CRO"
-    BTC = "BTC"
+class Coin(Enum):
     ETH = "ETH"
+    BTC = "BTC"
     SOL = "SOL"
+    XRP = "XRP"
     ADA = "ADA"
+    DOGE = "DOGE"
+    USDT = "USDT"
+    SUI = "SUI"
+    LINK = "LINK"
+    AERO = "AERO"
+    PENGU = "PENGU"
+    HBAR = "HBAR"
+    FARTCOIN = "FARTCOIN"
+    ZORA = "ZORA"
+    LTC = "LTC"
+    XLM = "XLM"
+    AVAX = "AVAX"
+    EDGE = "EDGE"
+    BONK = "BONK"
+    USDC = "USDC"
+    ENA = "ENA"
+    ONDO = "ONDO"
+    SKL = "SKL"
+    MDT = "MDT"
+    PEPE = "PEPE"
+    ARB = "ARB"
     DOT = "DOT"
+    AAVE = "AAVE"
+    CRV = "CRV"
+    PUMP = "PUMP"
+    MAGIC = "MAGIC"
+    TRUMP = "TRUMP"
+    UNI = "UNI"
+    SEI = "SEI"
+    LDO = "LDO"
+    WIF = "WIF"
+    LOKA = "LOKA"
+    LA = "LA"
+    TAO = "TAO"
+    JASMY = "JASMY"
+    BCH = "BCH"
+    ALGO = "ALGO"
+    SPK = "SPK"
+    SHIB = "SHIB"
+    NEAR = "NEAR"
+    FET = "FET"
+    PROVE = "PROVE"
+    EURC = "EURC"
+    XCN = "XCN"
+    TIA = "TIA"
+    INJ = "INJ"
+    IDEX = "IDEX"
+    TOSHI = "TOSHI"
+    VVV = "VVV"
+    FLR = "FLR"
+    PENDLE = "PENDLE"
+    RENDER = "RENDER"
+    CBETH = "CBETH"
+    MOODENG = "MOODENG"
+    ETC = "ETC"
+    POPCAT = "POPCAT"
+    ICP = "ICP"
+    CRO = "CRO"
+    AMP = "AMP"
+    KERNEL = "KERNEL"
+    STX = "STX"
+    ATOM = "ATOM"
+    APE = "APE"
+    OP = "OP"
+    ENS = "ENS"
+    SWELL = "SWELL"
+    FIL = "FIL"
+    BNKR = "BNKR"
+    ILV = "ILV"
+    VET = "VET"
+    BERA = "BERA"
+    SD = "SD"
+    IP = "IP"
+    CVX = "CVX"
+    APT = "APT"
+    SYRUP = "SYRUP"
+    TOWNS = "TOWNS"
+    MORPHO = "MORPHO"
+    GRT = "GRT"
+    DEGEN = "DEGEN"
+    MKR = "MKR"
+    MOG = "MOG"
+    PNUT = "PNUT"
+    AKT = "AKT"
+    COMP = "COMP"
+    B3 = "B3"
+    IMX = "IMX"
+    POL = "POL"
+    MAMO = "MAMO"
+    SUSHI = "SUSHI"
+    AIOZ = "AIOZ"
+    QNT = "QNT"
+    FLOKI = "FLOKI"
+    WLD = "WLD"
+    CLANKER = "CLANKER"
+    FIS = "FIS"
+    JTO = "JTO"
+    FORTH = "FORTH"
+    SUPER = "SUPER"
+    SXT = "SXT"
+    HOME = "HOME"
+    BIO = "BIO"
+    SKY = "SKY"
+    SUKU = "SUKU"
+    SWFTC = "SWFTC"
+    WCT = "WCT"
+    HNT = "HNT"
+    ETHFI = "ETHFI"
+    TURBO = "TURBO"
+    MATIC = "MATIC"
+    DIA = "DIA"
+    HFT = "HFT"
+    BAT = "BAT"
+    COOKIE = "COOKIE"
+    BOBA = "BOBA"
+    ACH = "ACH"
+    GIGA = "GIGA"
+    ROSE = "ROSE"
+    SAND = "SAND"
+    WELL = "WELL"
+    OMNI = "OMNI"
+    KAITO = "KAITO"
+    XTZ = "XTZ"
+    SNX = "SNX"
+    SHPING = "SHPING"
+    MLN = "MLN"
+    MASK = "MASK"
+    EIGEN = "EIGEN"
+    PROMPT = "PROMPT"
+    MSOL = "MSOL"
+    MANTLE = "MANTLE"
+    MANA = "MANA"
+    S = "S"
+    DOGINME = "DOGINME"
+    TREE = "TREE"
+    GODS = "GODS"
+    PYTH = "PYTH"
+    VELO = "VELO"
+    ATH = "ATH"
+    TRB = "TRB"
+    AXL = "AXL"
+    GTC = "GTC"
+    YFI = "YFI"
+    VOXEL = "VOXEL"
+    EGLD = "EGLD"
+    RARE = "RARE"
+    RAD = "RAD"
+    TNSR = "TNSR"
+    ZRO = "ZRO"
+    STRK = "STRK"
+    FAI = "FAI"
+    EOS = "EOS"
+    ZK = "ZK"
+    PRIME = "PRIME"
+    FARM = "FARM"
+    DAI = "DAI"
+    KARRAT = "KARRAT"
+    ZEC = "ZEC"
+    ASM = "ASM"
+    IO = "IO"
+    ORCA = "ORCA"
+    COTI = "COTI"
+    RSR = "RSR"
+    COW = "COW"
+    SHDW = "SHDW"
+    W = "W"
+    PAXG = "PAXG"
+    AERGO = "AERGO"
+    VTHO = "VTHO"
+    ZETA = "ZETA"
+    LCX = "LCX"
+    ARKM = "ARKM"
+    DEXT = "DEXT"
+    AUCTION = "AUCTION"
+    AXS = "AXS"
+    ERA = "ERA"
+    KAVA = "KAVA"
+    METIS = "METIS"
+    LPT = "LPT"
+    SPELL = "SPELL"
+    XYO = "XYO"
+    ACX = "ACX"
+    PRCL = "PRCL"
+    DRIFT = "DRIFT"
+    KEYCAT = "KEYCAT"
+    LRC = "LRC"
+    PRO = "PRO"
+    UMA = "UMA"
+    API3 = "API3"
+    GST = "GST"
+    MINA = "MINA"
+    HONEY = "HONEY"
+    RED = "RED"
+    ERN = "ERN"
+    BIGTIME = "BIGTIME"
+    PNG = "PNG"
+    GMT = "GMT"
+    FOX = "FOX"
+    NKN = "NKN"
+    KSM = "KSM"
+    ZRX = "ZRX"
+    TRAC = "TRAC"
+    CLV = "CLV"
+    SQD = "SQD"
+    SEAM = "SEAM"
+    AST = "AST"
+    MUSE = "MUSE"
+    GNO = "GNO"
+    AUDIO = "AUDIO"
+    CTSI = "CTSI"
+    REQ = "REQ"
+    KNC = "KNC"
+    VARA = "VARA"
+    ABT = "ABT"
+    LQTY = "LQTY"
+    BLUR = "BLUR"
+    GFI = "GFI"
+    ANKR = "ANKR"
+    CGLD = "CGLD"
+    REZ = "REZ"
+    GLM = "GLM"
+    SPA = "SPA"
+    BAND = "BAND"
+    NEWT = "NEWT"
+    LSETH = "LSETH"
+    CVC = "CVC"
+    NCT = "NCT"
+    HOPR = "HOPR"
+    WCFG = "WCFG"
+    ZEN = "ZEN"
+    CHZ = "CHZ"
+    L3 = "L3"
+    RONIN = "RONIN"
+    RSC = "RSC"
+    RPL = "RPL"
+    ALEPH = "ALEPH"
+    RARI = "RARI"
+    OGN = "OGN"
+    OXT = "OXT"
+    COSMOSDYDX = "COSMOSDYDX"
+    MATH = "MATH"
+    SAFE = "SAFE"
+    ALCX = "ALCX"
+    QI = "QI"
+    IOTX = "IOTX"
+    FIDA = "FIDA"
+    STORJ = "STORJ"
+    PIRATE = "PIRATE"
+    PERP = "PERP"
+    ALT = "ALT"
+    NEON = "NEON"
+    OCEAN = "OCEAN"
+    AVT = "AVT"
+    CELR = "CELR"
+    CORECHAIN = "CORECHAIN"
+    AURORA = "AURORA"
+    DNT = "DNT"
+    BLZ = "BLZ"
+    POLS = "POLS"
+    TRU = "TRU"
+    PLU = "PLU"
+    RLC = "RLC"
+    FORT = "FORT"
+    NMR = "NMR"
+    DASH = "DASH"
+    ME = "ME"
+    FLOW = "FLOW"
+    PYR = "PYR"
+    MPLX = "MPLX"
+    MNDE = "MNDE"
+    CAKE = "CAKE"
+    OSMO = "OSMO"
+    GHST = "GHST"
+    USDS = "USDS"
+    BICO = "BICO"
+    ZETACHAIN = "ZETACHAIN"
+    HIGH = "HIGH"
+    STG = "STG"
+    ACS = "ACS"
+    ALEO = "ALEO"
+    EUL = "EUL"
+    POND = "POND"
+    ELA = "ELA"
+    BLAST = "BLAST"
+    TIME = "TIME"
+    DIMO = "DIMO"
+    CTX = "CTX"
+    BAL = "BAL"
+    LRDS = "LRDS"
+    T = "T"
+    A8 = "A8"
+    PUNDIX = "PUNDIX"
+    BADGER = "BADGER"
+    KRL = "KRL"
+    POWR = "POWR"
+    AGLD = "AGLD"
+    C98 = "C98"
+    ALICE = "ALICE"
+    INDEX = "INDEX"
+    ARPA = "ARPA"
+    WAXL = "WAXL"
+    BTRST = "BTRST"
+    INV = "INV"
+    BNT = "BNT"
+    G = "G"
+    JITOSOL = "JITOSOL"
+    PAX = "PAX"
+    RNDR = "RNDR"
 
 
 @dataclass
@@ -24,8 +333,8 @@ class Record:
     uuid: str
     created_at: datetime
     type: RecordType
-    asset: AssetType
-    asset_amount: float
+    coin: Coin
+    coin_amount: float
     fiat_amount: float
     order_price: float
 
@@ -36,54 +345,51 @@ class Record:
             uuid=d.get("uuid", str(uuid.uuid4())),
             created_at=datetime.strptime(d.get("created_at", datetime.now(timezone.utc)), "%Y-%m-%dT%H:%M:%S.%fZ"),
             type=RecordType(d.get("type")),
-            asset=AssetType(d.get("asset")),
-            asset_amount=float(d.get("asset_amount")),
+            coin=Coin(d.get("coin")),
+            coin_amount=float(d.get("coin_amount")),
             fiat_amount=float(d.get("fiat_amount")),
             order_price=float(d.get("order_price"))
         )
+    
+
+    @classmethod
+    def from_cb_order(cls, o: Order) -> "Record":
+        return cls(
+            uuid=str(uuid.uuid4()),
+            created_at=datetime.strptime(o.created_time, "%Y-%m-%dT%H:%M:%S.%fZ"),
+            type=RecordType.BUY if o.side == "BUY" else RecordType.SELL,
+            coin=Coin(o.product_id.split("-")[0]),
+            coin_amount=float(o.filled_size),
+            fiat_amount=float(o.filled_value),
+            order_price=float(o.average_filled_price)
+        )
+    
+
+@dataclass
+class Asset:
+    coin: Coin
+    invested_fiat_amount: float
+    current_fiat_amount: float
+    highest_fiat_amount: float
+    latest_action: RecordType
+    latest_sold_fiat_amount: float
+    initial_coin_amount: float
+    highest_coin_amount: float
+    current_coin_amount: float
+    net_profit: float
 
 
-# def parse_datetime(dt_str: Optional[str]) -> Optional[datetime]:
-#     if dt_str is None:
-#         return None
-#     try:
-#         # Handles both with and without microseconds
-#         return datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
-#     except Exception:
-#         return None
-
-# @dataclass
-# class Account:
-#     uuid: str
-#     name: str
-#     currency: str
-#     available_balance: float
-#     default: bool
-#     active: bool
-#     created_at: datetime
-#     updated_at: datetime
-#     deleted_at: Optional[datetime]
-#     type: str
-#     ready: bool
-#     hold: float
-#     retail_portfolio_id: str
-#     platform: str
-
-#     @classmethod
-#     def from_dict(cls, d: dict) -> "Account":
-#         return cls(
-#             uuid=d.get("uuid", ""),
-#             name=d.get("name", ""),
-#             currency=d.get("currency", ""),
-#             available_balance=float(d.get("available_balance").get("value")),
-#             default=bool(d.get("default", False)),
-#             active=bool(d.get("active", False)),
-#             created_at=parse_datetime(d.get("created_at")),
-#             updated_at=parse_datetime(d.get("updated_at")),
-#             deleted_at=parse_datetime(d.get("deleted_at")),
-#             type=d.get("type", ""),
-#             ready=bool(d.get("ready", False)),
-#             hold=float(d.get("hold").get("value")),
-#             retail_portfolio_id=d.get("retail_portfolio_id", ""),
-#             platform=d.get("platform", "")
-#         )
+    @classmethod
+    def from_dict(cls, d: dict) -> "Asset":
+        return cls(
+            coin=Coin(d.get("coin")),
+            invested_fiat_amount=float(d.get("invested_fiat_amount", 0)),
+            current_fiat_amount=float(d.get("current_fiat_amount", 0)),
+            highest_fiat_amount=float(d.get("highest_fiat_amount", 0)),
+            latest_action=RecordType(d.get("latest_action", RecordType.NONE)),
+            latest_sold_fiat_amount=float(d.get("latest_sold_fiat_amount", 0)),
+            initial_coin_amount=float(d.get("initial_coin_amount", 0)),
+            highest_coin_amount=float(d.get("highest_coin_amount", 0)),
+            current_coin_amount=float(d.get("current_coin_amount", 0)),
+            net_profit=float(d.get("net_profit", 0))
+        )
