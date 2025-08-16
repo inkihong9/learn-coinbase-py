@@ -1,8 +1,8 @@
 version: "3.9"
 services:
-  learn-coinbase-2:
+  learn-coinbase:
     build: .
-    container_name: learn-coinbase-2
+    container_name: learn-coinbase
     environment:
       - KEY=value
     volumes:
