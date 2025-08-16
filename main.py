@@ -4,9 +4,18 @@ import os, logging
 
 from coinbase.rest import RESTClient
 
-# from models import Account
+from models import Record, RecordType, AssetType
+
+from json import loads
 
 logging.basicConfig(level=logging.INFO)
+
+records = []
+
+with open('./records/records.json', 'r') as f:
+    for record_raw in loads(f.read()):
+        record = Record.from_dict(record_raw)
+        records.append(record)
 
 
 coinbase_api_key = os.getenv('COINBASE_API_KEY')
@@ -24,7 +33,7 @@ all_orders = rest_client.list_orders()
 # active_orders = []
 
 non_cancelled_orders = [
-    o for o in all_orders.orders 
+    o for o in all_orders.orders
     if o.status != 'CANCELLED'
 ]
 

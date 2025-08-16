@@ -1,6 +1,46 @@
-# from dataclasses import dataclass
-# from typing import Optional
-# from datetime import datetime
+from enum import Enum
+from dataclasses import dataclass
+from datetime import datetime, timezone
+import uuid
+
+
+class RecordType(Enum):
+    BUY = "BUY"
+    SELL = "SELL"
+    INVEST = "INVEST"
+
+
+class AssetType(Enum):
+    CRO = "CRO"
+    BTC = "BTC"
+    ETH = "ETH"
+    SOL = "SOL"
+    ADA = "ADA"
+    DOT = "DOT"
+
+
+@dataclass
+class Record:
+    uuid: str
+    created_at: datetime
+    type: RecordType
+    asset: AssetType
+    asset_amount: float
+    fiat_amount: float
+    order_price: float
+
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "Record":
+        return cls(
+            uuid=d.get("uuid", str(uuid.uuid4())),
+            created_at=datetime.strptime(d.get("created_at", datetime.now(timezone.utc)), "%Y-%m-%dT%H:%M:%S.%fZ"),
+            type=RecordType(d.get("type")),
+            asset=AssetType(d.get("asset")),
+            asset_amount=float(d.get("asset_amount")),
+            fiat_amount=float(d.get("fiat_amount")),
+            order_price=float(d.get("order_price"))
+        )
 
 
 # def parse_datetime(dt_str: Optional[str]) -> Optional[datetime]:
