@@ -4,7 +4,6 @@ import os, logging
 
 from coinbase.rest import RESTClient
 
-
 # from models import Account
 
 logging.basicConfig(level=logging.INFO)
@@ -12,8 +11,6 @@ logging.basicConfig(level=logging.INFO)
 
 coinbase_api_key = os.getenv('COINBASE_API_KEY')
 coinbase_api_secret = os.getenv('COINBASE_API_SECRET')
-
-
 
 if not coinbase_api_key or not coinbase_api_secret:
     raise EnvironmentError('Please set the COINBASE_API_KEY and COINBASE_API_SECRET environment variables.')

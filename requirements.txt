@@ -17,6 +17,7 @@ construct==2.10.68
 construct-typing==0.6.2
 cryptography==45.0.6
 cytoolz==1.0.1
+debugpy==1.8.16
 eth-account==0.13.7
 eth-hash==0.7.1
 eth-keyfile==0.8.1
