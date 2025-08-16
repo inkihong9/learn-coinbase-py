@@ -10,18 +10,23 @@ logging.basicConfig(level=logging.INFO)
 records = []
 assets = {}
 
-with open('./data/records.json', 'r') as f:
-    for record_raw in loads(f.read()):
-        record = Record.from_dict(record_raw)
-        records.append(record)
-
 
 with open('./data/assets.json', 'r') as f:
     for asset_raw in loads(f.read()):
         asset = Asset.from_dict(asset_raw)
         coin_key = asset.coin.value
         assets[coin_key] = asset
-        # assets.append(asset)
+
+
+with open('./data/records.json', 'r') as f:
+    for record_raw in loads(f.read()):
+        record = Record.from_dict(record_raw)
+        records.append(record)
+        coin_key = record.coin.value
+        if coin_key in assets:
+            asset = assets[coin_key]
+            asset.initial_coin_amount = record.coin_amount
+            asset.invested_fiat_amount = record.fiat_amount
 
 
 coinbase_api_key = os.getenv('COINBASE_API_KEY')
@@ -33,16 +38,25 @@ if not coinbase_api_key or not coinbase_api_secret:
 rest_client = RESTClient(coinbase_api_key, coinbase_api_secret)
 
 all_accounts = rest_client.get_accounts()
-filled_orders = rest_client.list_orders(order_status='FILLED')
+filled_orders = rest_client.list_orders(order_status='FILLED', start_date='2025-01-01T00:00:00.000Z')
 
 
-for order in filled_orders.orders:
+for order in reversed(filled_orders.orders):
     record = Record.from_cb_order(order)
     coin_key = record.coin.value
     if coin_key in assets:
         asset = assets[coin_key]
-        # asset.current_fiat_amount += record.fiat_amount
-        # asset.current_coin_amount += record.coin_amount
+        asset.latest_action = record.type
+        asset.highest_fiat_amount = max(asset.highest_fiat_amount, record.fiat_amount)
+        asset.highest_coin_amount = max(asset.highest_coin_amount, record.coin_amount)
+        if record.type == RecordType.SELL:
+            asset.current_fiat_amount = record.fiat_amount
+            asset.current_coin_amount = 0
+        else:
+            asset.current_fiat_amount = 0
+            asset.current_coin_amount = record.coin_amount
+        # asset.current_fiat_amount = record.fiat_amount
+        # asset.current_coin_amount = record.coin_amount
         # asset.latest_action = record.type
     # asset = assets
     # logging.info(order)
@@ -51,6 +65,12 @@ for order in filled_orders.orders:
     # active_orders.append(o)
     # logging.info(order)
     # refer to order_sample.json for sample output
+
+print("Coin | Invested Amount | Initial Coin Amount | Current USD Amount | Highest USD Amount | Current Coin Amount | Highest Coin Amount | Net Profit | Latest Action")
+
+
+for asset in assets.values():
+    print(f"{asset.coin.value}  | {asset.invested_fiat_amount:.2f} | {asset.initial_coin_amount:.4f} | {asset.current_fiat_amount:.2f} | {asset.highest_fiat_amount:.2f} | {asset.current_coin_amount:.4f} | {asset.highest_coin_amount:.4f} | {asset.net_profit:.2f} | {asset.latest_action.value}")
 
 logging.info("hello world")
 

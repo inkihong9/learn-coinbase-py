@@ -6,7 +6,6 @@ import uuid
 
 
 class RecordType(Enum):
-    NONE = "NONE"
     BUY = "BUY"
     SELL = "SELL"
     INVEST = "INVEST"
@@ -360,7 +359,7 @@ class Record:
             type=RecordType.BUY if o.side == "BUY" else RecordType.SELL,
             coin=Coin(o.product_id.split("-")[0]),
             coin_amount=float(o.filled_size),
-            fiat_amount=float(o.filled_value),
+            fiat_amount=float(o.total_value_after_fees),
             order_price=float(o.average_filled_price)
         )
     
@@ -369,14 +368,14 @@ class Record:
 class Asset:
     coin: Coin
     invested_fiat_amount: float
+    initial_coin_amount: float
     current_fiat_amount: float
     highest_fiat_amount: float
+    current_coin_amount: float
+    highest_coin_amount: float
+    net_profit: float
     latest_action: RecordType
     latest_sold_fiat_amount: float
-    initial_coin_amount: float
-    highest_coin_amount: float
-    current_coin_amount: float
-    net_profit: float
 
 
     @classmethod
@@ -386,7 +385,7 @@ class Asset:
             invested_fiat_amount=float(d.get("invested_fiat_amount", 0)),
             current_fiat_amount=float(d.get("current_fiat_amount", 0)),
             highest_fiat_amount=float(d.get("highest_fiat_amount", 0)),
-            latest_action=RecordType(d.get("latest_action", RecordType.NONE)),
+            latest_action=RecordType(d.get("latest_action", RecordType.INVEST)),
             latest_sold_fiat_amount=float(d.get("latest_sold_fiat_amount", 0)),
             initial_coin_amount=float(d.get("initial_coin_amount", 0)),
             highest_coin_amount=float(d.get("highest_coin_amount", 0)),
