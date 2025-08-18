@@ -37,7 +37,20 @@ if not coinbase_api_key or not coinbase_api_secret:
 
 rest_client = RESTClient(coinbase_api_key, coinbase_api_secret)
 
-all_accounts = rest_client.get_accounts()
+all_accounts = []
+has_next = True
+cursor = None
+
+while has_next:
+    accounts = rest_client.get_accounts(cursor=cursor)
+    has_next = accounts.has_next
+    if has_next:
+        cursor = accounts.cursor
+    
+    all_accounts.extend(accounts.accounts)
+
+# watchlist_accounts = rest_client.get_accounts().accounts
+watchlist_accounts = [a for a in all_accounts if a.currency in assets.keys()]
 filled_orders = rest_client.list_orders(order_status='FILLED', start_date='2025-01-01T00:00:00.000Z')
 
 
@@ -55,6 +68,7 @@ for order in reversed(filled_orders.orders):
         else:
             asset.current_fiat_amount = 0
             asset.current_coin_amount = record.coin_amount
+        asset.net_profit = asset.current_fiat_amount - asset.invested_fiat_amount
         # asset.current_fiat_amount = record.fiat_amount
         # asset.current_coin_amount = record.coin_amount
         # asset.latest_action = record.type
@@ -66,13 +80,14 @@ for order in reversed(filled_orders.orders):
     # logging.info(order)
     # refer to order_sample.json for sample output
 
+# in here it will iterate through the assets and calculate the remaining values
+watchlist_assets = set(assets.keys())
+
 print("Coin | Invested Amount | Initial Coin Amount | Current USD Amount | Highest USD Amount | Current Coin Amount | Highest Coin Amount | Net Profit | Latest Action")
 
 
 for asset in assets.values():
-    print(f"{asset.coin.value}  | {asset.invested_fiat_amount:.2f} | {asset.initial_coin_amount:.4f} | {asset.current_fiat_amount:.2f} | {asset.highest_fiat_amount:.2f} | {asset.current_coin_amount:.4f} | {asset.highest_coin_amount:.4f} | {asset.net_profit:.2f} | {asset.latest_action.value}")
-
-logging.info("hello world")
+    print(f"{asset.coin.value}  | {asset.invested_fiat_amount:.2f} | {asset.initial_coin_amount:.8f} | {asset.current_fiat_amount:.2f} | {asset.highest_fiat_amount:.2f} | {asset.current_coin_amount:.8f} | {asset.highest_coin_amount:.8f} | {asset.net_profit:.2f} | {asset.latest_action.value}")
 
 # for account in non_empty_accounts:
     # logging.info(account)
