@@ -1,5 +1,9 @@
 # https://github.com/coinbase/coinbase-advanced-py/
 
+# refer to account_sample.json for sample output
+# difference between account.hold vs account.available_balance: account.hold refers to staked asset, 
+# while account.available_balance refers to amount available for trading or selling
+
 from coinbase.rest import RESTClient
 from models import Record, RecordType, Coin, Asset
 from json import loads
@@ -70,28 +74,12 @@ for order in reversed(filled_orders.orders):
             asset.current_coin_amount = record.coin_amount
         asset.net_profit = asset.current_fiat_amount - asset.invested_fiat_amount
 
-# in here it will iterate through the assets and calculate the remaining values
+# iterate through the watchlist accounts and calculate the remaining values
 for account in watchlist_accounts:
     coin_key = account.currency
     if coin_key in assets:
         asset = assets[coin_key]
         asset.current_coin_amount = float(account.available_balance['value']) + float(account.hold['value'])
-        
-# for coin, asset in assets.items():
-#     account 
-#     if asset.current_fiat_amount == 0 and asset.current_coin_amount == 0:
-#         asset.current_fiat_amount = asset.invested_fiat_amount
-        # asset.current_coin_amount = asset.initial_coin_amount
-
-# "available_balance": {
-#                 "value": "0",
-#                 "currency": "CBETH"
-#             },
-
-# "hold": {
-#                 "value": "0",
-#                 "currency": "CBETH"
-#             },
 
 
 print("Coin | Invested Amount | Initial Coin Amount | Current USD Amount | Highest USD Amount | Current Coin Amount | Highest Coin Amount | Net Profit | Latest Action")
@@ -106,13 +94,4 @@ for asset in assets.values():
     col7 = f"{asset.highest_coin_amount:.8f}".ljust(19, ' ')
     col8 = f"{asset.net_profit:.2f}".ljust(10, ' ')
     col9 = asset.latest_action.value.ljust(12, ' ')
-    # print(f"{asset.coin.value}  | {asset.invested_fiat_amount:.2f} | {asset.initial_coin_amount:.8f} | {asset.current_fiat_amount:.2f} | {asset.highest_fiat_amount:.2f} | {asset.current_coin_amount:.8f} | {asset.highest_coin_amount:.8f} | {asset.net_profit:.2f} | {asset.latest_action.value}")
     print(f"{asset.coin.value}  | {col2} | {col3} | {col4} | {col5} | {col6} | {col7} | {col8} | {col9}")
-
-# for account in non_empty_accounts:
-    # logging.info(account)
-
-    # print(dumps(account.to_dict(), indent=2))
-    # refer to account_sample.json for sample output
-    # difference between account.hold vs account.available_balance: account.hold refers to staked asset, 
-    # while account.available_balance refers to amount available for trading or selling
