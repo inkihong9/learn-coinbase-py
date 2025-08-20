@@ -1,5 +1,6 @@
 venv
 .vscode
-notes
+api
 __pycache__
 data
+coinbase-response-data
