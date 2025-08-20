@@ -368,14 +368,13 @@ class Record:
 class Asset:
     coin: Coin
     invested_fiat_amount: float
-    initial_coin_amount: float
     current_fiat_amount: float
-    highest_fiat_amount: float
+    latest_sell_fiat_amount: float
+    initial_coin_amount: float
     current_coin_amount: float
-    highest_coin_amount: float
+    latest_buy_coin_amount: float
     net_profit: float
     latest_action: RecordType
-    latest_sold_fiat_amount: float
 
 
     @classmethod
@@ -384,11 +383,10 @@ class Asset:
             coin=Coin(d.get("coin")),
             invested_fiat_amount=float(d.get("invested_fiat_amount", 0)),
             current_fiat_amount=float(d.get("current_fiat_amount", 0)),
-            highest_fiat_amount=float(d.get("highest_fiat_amount", 0)),
-            latest_action=RecordType(d.get("latest_action", RecordType.INVEST)),
-            latest_sold_fiat_amount=float(d.get("latest_sold_fiat_amount", 0)),
+            latest_sell_fiat_amount=float(d.get("latest_sell_fiat_amount", 0)),
             initial_coin_amount=float(d.get("initial_coin_amount", 0)),
-            highest_coin_amount=float(d.get("highest_coin_amount", 0)),
             current_coin_amount=float(d.get("current_coin_amount", 0)),
-            net_profit=float(d.get("net_profit", 0))
+            latest_buy_coin_amount=float(d.get("latest_buy_coin_amount", 0)),
+            net_profit=float(d.get("net_profit", 0)),
+            latest_action=RecordType(d.get("latest_action", RecordType.INVEST))
         )

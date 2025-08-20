@@ -53,28 +53,30 @@ while has_next:
     
     cb_all_accounts.extend(cb_accounts.accounts)
 
-# watchlist_accounts = rest_client.get_accounts().accounts
+
 cb_watchlist_accounts = [a for a in cb_all_accounts if a.currency in assets.keys() and a.name.endswith('Wallet')]
+cb_watchlist_accounts_dict = { a.currency: a for a in cb_watchlist_accounts }
 cb_filled_orders = rest_client.list_orders(order_status='FILLED', start_date='2025-01-01T00:00:00.000Z')
 cb_products = rest_client.get_products(product_ids=['XRP-USD', 'ETH-USD', 'ADA-USD', 'DOT-USD', 'CRO-USD', 'SOL-USD'])
-cb_products_dict = {p.product_id.split('-')[0]: p for p in cb_products.products}
+cb_products_dict = { p.product_id.split('-')[0]: p for p in cb_products.products }
 
 
 for order in reversed(cb_filled_orders.orders):
     record = Record.from_cb_order(order)
     coin_key = record.coin.value
     if coin_key in assets:
+        cb_product = cb_products_dict.get(coin_key)
+        cb_account = cb_watchlist_accounts_dict.get(coin_key)
         asset = assets[coin_key]
         asset.latest_action = record.type
-        asset.highest_fiat_amount = max(asset.highest_fiat_amount, record.fiat_amount)
-        asset.highest_coin_amount = max(asset.highest_coin_amount, record.coin_amount)
         if record.type == RecordType.SELL:
+            asset.latest_sell_fiat_amount = record.fiat_amount
             asset.current_fiat_amount = record.fiat_amount
             asset.current_coin_amount = 0
+            asset.net_profit = asset.latest_sell_fiat_amount - asset.invested_fiat_amount
         else:
             asset.current_fiat_amount = 0
             asset.current_coin_amount = record.coin_amount
-        asset.net_profit = asset.current_fiat_amount - asset.invested_fiat_amount
 
 # iterate through the watchlist accounts and calculate the remaining values
 for cb_account in cb_watchlist_accounts:
@@ -84,6 +86,8 @@ for cb_account in cb_watchlist_accounts:
         asset = assets[coin_key]
         asset.current_coin_amount = float(cb_account.available_balance['value']) + float(cb_account.hold['value'])
         asset.current_fiat_amount = asset.current_coin_amount * float(cb_product.price)
+        if asset.net_profit == 0:
+            asset.net_profit = asset.current_fiat_amount - asset.invested_fiat_amount
 
 # bid price = highest price buyers are willing to pay
 # ask price = lowest price sellers are willing to accept
@@ -91,14 +95,14 @@ for cb_account in cb_watchlist_accounts:
 
 
 # print the dashboard
-print("Coin | Invested Amount | Initial Coin Amount | Current USD Amount | Highest USD Amount | Current Coin Amount | Highest Coin Amount | Net Profit | Latest Action")
+print("Coin | Invested Amount | Current USD Amount | Latest Sell USD Amount | Initial Coin Amount | Current Coin Amount | Latest Buy Coin Amount | Net Profit | Latest Action")
 for asset in assets.values():
-    col2 = f"{asset.invested_fiat_amount:.2f}".ljust(15, ' ')
-    col3 = f"{asset.initial_coin_amount:.8f}".ljust(19, ' ')
-    col4 = f"{asset.current_fiat_amount:.2f}".ljust(18, ' ')
-    col5 = f"{asset.highest_fiat_amount:.2f}".ljust(18, ' ')
-    col6 = f"{asset.current_coin_amount:.8f}".ljust(19, ' ')
-    col7 = f"{asset.highest_coin_amount:.8f}".ljust(19, ' ')
-    col8 = f"{asset.net_profit:.2f}".ljust(10, ' ')
-    col9 = asset.latest_action.value.ljust(12, ' ')
+    col2 = f"{asset.invested_fiat_amount:.2f}".ljust(15, ' ')    # Invested Amount
+    col3 = f"{asset.current_fiat_amount:.2f}".ljust(18, ' ')     # Current USD Amount
+    col4 = f"{asset.latest_sell_fiat_amount:.2f}".ljust(22, ' ') # Latest Sell USD Amount
+    col5 = f"{asset.initial_coin_amount:.8f}".ljust(19, ' ')     # Initial Coin Amount
+    col6 = f"{asset.current_coin_amount:.8f}".ljust(19, ' ')     # Current Coin Amount
+    col7 = f"{asset.latest_buy_coin_amount:.8f}".ljust(22, ' ')  # Latest Buy Coin Amount
+    col8 = f"{asset.net_profit:.2f}".ljust(10, ' ')              # Net Profit
+    col9 = asset.latest_action.value.ljust(13, ' ')              # Latest Action
     print(f"{asset.coin.value}  | {col2} | {col3} | {col4} | {col5} | {col6} | {col7} | {col8} | {col9}")
