@@ -18,3 +18,11 @@ def print_dashboard(assets: dict):
         col11 = asset.latest_action.value.ljust(13, ' ')                                   # Latest Action
         col12 = asset.latest_transaction_date.strftime("%Y-%m-%d %H:%M:%S").ljust(23, ' ') # Latest Transaction Date
         print(f"{coin}  | {col2} | {col3} | {col4} | {col5} | {col6} | {col7} | {col8} | {col9} | {col10} | {col11} | {col12}")
+
+
+def print_aggregated_dashboard(assets: dict):
+    total_invested = sum(asset.invested_fiat_amount for asset in assets.values())
+    total_net_profit = sum(asset.net_profit for asset in assets.values())
+    print("\nAggregated Dashboard:")
+    print(f"Total Invested Amount: ${total_invested:.2f}")
+    print(f"Total Net Profit: ${total_net_profit:.2f}\n")

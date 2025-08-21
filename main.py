@@ -6,7 +6,7 @@
 
 from coinbase.rest import RESTClient
 from models import Record, RecordType, Coin, Asset
-from dashboard import print_dashboard as pd
+from dashboard import print_dashboard as pd, print_aggregated_dashboard as pad
 from json import loads
 from datetime import datetime
 import os, logging
@@ -60,19 +60,13 @@ while has_next:
     cb_all_accounts.extend(cb_accounts.accounts)
 
 
-# see if there's an API method i can call to get watchlist accounts only
-
-
 cb_watchlist_accounts = [a for a in cb_all_accounts if a.currency in assets.keys() and a.name.endswith('Wallet')]
 cb_watchlist_accounts_dict = { a.currency: a for a in cb_watchlist_accounts }
 cb_filled_orders = rest_client.list_orders(order_status='FILLED', start_date='2025-01-01T00:00:00.000Z')
 cb_filled_orders_dict = { f"{o.product_id.split('-')[0]}-{o.side}": o for o in reversed(cb_filled_orders.orders) }
-cb_products = rest_client.get_products(product_ids=['XRP-USD', 'ETH-USD', 'ADA-USD', 'DOT-USD', 'CRO-USD', 'SOL-USD'])
-cb_products_dict = { p.product_id.split('-')[0]: p for p in cb_products.products }
+cb_products = rest_client.get_products()
+cb_products_dict = { p.product_id.split('-')[0]: p for p in cb_products.products if p.watched }
 
-
-# prints the dashboard
-pd(assets)
 
 # step 1. iterate through the filled orders in chronological order
 for cb_order in reversed(cb_filled_orders.orders):
@@ -88,7 +82,6 @@ for cb_order in reversed(cb_filled_orders.orders):
         asset.latest_sell_fiat_amount = float(cb_order.total_value_after_fees)
         asset.sell_price = float(cb_order.average_filled_price)
         asset.current_fiat_amount = asset.latest_sell_fiat_amount
-    pd(assets)
 
 
 # step 2. iterate through the assets to retrieve the product price and account balance to
@@ -107,4 +100,8 @@ for coin, asset in assets.items():
     if asset.latest_transaction_date < datetime(2025, 1, 1):
         asset.current_fiat_amount = asset.current_coin_amount * float(cb_product.price)
     asset.net_profit = asset.current_fiat_amount - asset.invested_fiat_amount
-    pd(assets)
+
+
+pd(assets)
+print("\n\n")
+pad(assets)
