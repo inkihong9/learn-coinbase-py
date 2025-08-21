@@ -88,7 +88,6 @@ for cb_order in reversed(cb_filled_orders.orders):
         asset.latest_sell_fiat_amount = float(cb_order.total_value_after_fees)
         asset.sell_price = float(cb_order.average_filled_price)
         asset.current_fiat_amount = asset.latest_sell_fiat_amount
-
     pd(assets)
 
 
@@ -101,132 +100,11 @@ for cb_order in reversed(cb_filled_orders.orders):
 #         else if asset's latest transaction date is on or after 2025-01-01
 #             current_coin_amount = available_balance + hold
 #             net_profit = current_fiat_amount - invested_fiat_amount
-
-
-    # record = Record.from_cb_order(cb_order)
-    # coin_key = record.coin.value
-    # if coin_key in assets:
-    #     asset = assets[coin_key]
-    #     asset.latest_action = record.type
-    #     if record.type == RecordType.SELL:
-    #         asset.latest_sell_fiat_amount = record.fiat_amount
-    #         asset.current_fiat_amount = record.fiat_amount
-    #         asset.current_coin_amount = 0
-    #         asset.net_profit = asset.latest_sell_fiat_amount - asset.invested_fiat_amount
-    #         skip_cb_accounts.add(coin_key)
-    #     else:
-    #         asset.current_fiat_amount = 0
-    #         asset.current_coin_amount = record.coin_amount
-    #         asset.latest_buy_coin_amount = record.coin_amount
-    #         skip_cb_accounts.remove(coin_key)
-
-
-# iterate through the assets and fill in the initial values
-# for coin_key, asset in assets.items():
-#     cb_order = cb_filled_orders_dict.get(coin_key)
-#     cb_account = cb_watchlist_accounts_dict.get(coin_key)
-#     cb_product = cb_products_dict.get(coin_key)
-#     record = Record.from_cb_order(cb_order) if cb_order else None
-#     if record:
-#         asset.latest_action = record.type
-
-#         if record.type == RecordType.SELL:
-#             asset.latest_sell_fiat_amount = record.fiat_amount
-#             # asset.current_fiat_amount = record.fiat_amount
-#             asset.current_coin_amount = 0
-#             asset.order_price = record.order_price
-#             # asset.net_profit = asset.latest_sell_fiat_amount - asset.invested_fiat_amount
-#             # skip_cb_accounts.add(coin_key)
-#         else:
-#             asset.current_fiat_amount = 0
-#             # asset.current_coin_amount = record.coin_amount
-#             asset.latest_buy_coin_amount = record.coin_amount
-#             asset.order_price = record.order_price
-#         # current coin amount = available balance + hold
-#         # current usd amount = current coin amount * product price
-#         # net profit = current usd amount - invested fiat amount
-
-#     else:
-#         asset.net_profit = -9999.99
-            # skip_cb_accounts.remove(coin_key)
-    # if not record:
-    #     asset.latest_action = RecordType.INVEST
-
-
-# print("only the latest filled order for each coin")
-# for order in cb_filled_orders.orders:
-#     record = Record.from_cb_order(order)
-#     coin_key = record.coin.value
-#     if not coin_keys.get(coin_key):
-#         coin_keys[coin_key] = True
-#         asset = assets.get(coin_key)
-#         asset.latest_action = record.type
-#         if record.type == RecordType.SELL:
-#             asset.latest_sell_fiat_amount = record.fiat_amount
-#             asset.current_fiat_amount = record.fiat_amount
-#             asset.current_coin_amount = 0
-#             asset.net_profit = asset.latest_sell_fiat_amount - asset.invested_fiat_amount
-#             skip_cb_accounts.add(coin_key)
-#         else:
-#             asset.current_fiat_amount = 0
-#             asset.current_coin_amount = record.coin_amount
-#             asset.latest_buy_coin_amount = record.coin_amount
-            # skip_cb_accounts.remove(coin_key)
-
-# for order in reversed(cb_filled_orders.orders):
-#     record = Record.from_cb_order(order)
-#     coin_key = record.coin.value
-#     if coin_key in assets:
-#         cb_product = cb_products_dict.get(coin_key)
-#         cb_account = cb_watchlist_accounts_dict.get(coin_key)
-#         asset = assets[coin_key]
-#         asset.latest_action = record.type
-#         if record.type == RecordType.SELL:
-#             asset.latest_sell_fiat_amount = record.fiat_amount
-#             asset.current_fiat_amount = record.fiat_amount
-#             asset.current_coin_amount = 0
-#             asset.net_profit = asset.latest_sell_fiat_amount - asset.invested_fiat_amount
-#             skip_cb_accounts.add(coin_key)
-#         else:
-#             asset.current_fiat_amount = 0
-#             asset.current_coin_amount = record.coin_amount
-#             asset.latest_buy_coin_amount = record.coin_amount
-#             skip_cb_accounts.remove(coin_key)
-
-# iterate through the watchlist accounts and calculate the remaining values
-# for cb_account in cb_watchlist_accounts:
-#     coin_key = cb_account.currency
-#     if coin_key in assets and not skip_cb_accounts.__contains__(coin_key):
-#         cb_product = cb_products_dict.get(coin_key)
-#         asset = assets[coin_key]
-#         asset.current_coin_amount = float(cb_account.available_balance['value']) + float(cb_account.hold['value'])
-#         asset.current_fiat_amount = asset.current_coin_amount * float(cb_product.price)
-#         if asset.net_profit == 0:
-#             asset.net_profit = asset.current_fiat_amount - asset.invested_fiat_amount
-
-# bid price = highest price buyers are willing to pay
-# ask price = lowest price sellers are willing to accept
-# spread = ask price - bid price
-
-
-# print the dashboard
-# print("Coin | Initial Coin Amount | Current Coin Amount | Latest Buy Coin Amount | Invested Amount | Current USD Amount | Latest Sell USD Amount | Net Profit | Order Price | Latest Action")
-# for asset in assets.values():
-#     col2  = f"{asset.initial_coin_amount:.8f}".ljust(19, ' ')     # Initial Coin Amount
-#     col3  = f"{asset.current_coin_amount:.8f}".ljust(19, ' ')     # Current Coin Amount
-#     col4  = f"{asset.latest_buy_coin_amount:.8f}".ljust(22, ' ')  # Latest Buy Coin Amount
-#     col5  = f"{asset.invested_fiat_amount:.2f}".ljust(15, ' ')    # Invested Amount
-#     col6  = f"{asset.current_fiat_amount:.2f}".ljust(18, ' ')     # Current USD Amount
-#     col7  = f"{asset.latest_sell_fiat_amount:.2f}".ljust(22, ' ') # Latest Sell USD Amount
-#     col8  = f"{asset.net_profit:.2f}".ljust(10, ' ')              # Net Profit
-#     col9  = f"{asset.order_price:.2f}".ljust(11, ' ')             # Order Price
-#     col10 = asset.latest_action.value.ljust(13, ' ')              # Latest Action
-#     print(f"{asset.coin.value}  | {col2} | {col3} | {col4} | {col5} | {col6} | {col7} | {col8} | {col9} | {col10}")
-
-
-# print all account balances
-# print("\n\n\n\nCoin     | Total Balance")
-# for cb_account in cb_all_accounts:
-#     col1 = f"{cb_account.currency}".ljust(8, ' ')
-#     col2 = f"{(float(cb_account.available_balance['value']) + float(cb_account.hold['value']))}"
-#     print(f"{col1} | {col2}")
+for coin, asset in assets.items():
+    cb_product = cb_products_dict.get(coin)
+    cb_account = cb_watchlist_accounts_dict.get(coin)
+    asset.current_coin_amount = float(cb_account.available_balance['value']) + float(cb_account.hold['value'])
+    if asset.latest_transaction_date < datetime(2025, 1, 1):
+        asset.current_fiat_amount = asset.current_coin_amount * float(cb_product.price)
+    asset.net_profit = asset.current_fiat_amount - asset.invested_fiat_amount
+    pd(assets)
