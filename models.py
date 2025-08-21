@@ -377,6 +377,7 @@ class Asset:
     sell_price: float
     latest_action: RecordType
     latest_transaction_date: datetime
+    unit_price: float
 
 
     @classmethod
@@ -393,5 +394,6 @@ class Asset:
             buy_price=float(d.get("buy_price", 0)),
             sell_price=float(d.get("sell_price", 0)),
             latest_action=RecordType(d.get("latest_action", RecordType.BUY)),
-            latest_transaction_date=d.get("latest_transaction_date", datetime.now(timezone.utc))
+            latest_transaction_date=d.get("latest_transaction_date", datetime.now(timezone.utc)),
+            unit_price=float(d.get("unit_price", 0))
         )

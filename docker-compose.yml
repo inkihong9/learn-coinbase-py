@@ -4,8 +4,42 @@ services:
     build: .
     container_name: learn-coinbase-py
     environment:
-      - KEY=value
+      - KEY: ${KEY}
     volumes:
       - .:/app
     tty: true
     stdin_open: true
+
+
+# version: "3.9"
+# services:
+#   mysql:
+#     image: mysql:8.0
+#     container_name: mysql-db
+#     environment:
+#       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+#       MYSQL_DATABASE: ${MYSQL_DATABASE}
+#       MYSQL_USER: ${MYSQL_USER}
+#       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#     ports:
+#       - "3306:3306"
+#     volumes:
+#       - mysql_data:/var/lib/mysql
+
+#   python-app:
+#     build: .
+#     container_name: python-app
+#     environment:
+#       DB_USER: ${MYSQL_USER}
+#       DB_PASSWORD: ${MYSQL_PASSWORD}
+#       DB_NAME: ${MYSQL_DATABASE}
+#       DB_HOST: mysql
+#     depends_on:
+#       - mysql
+#     volumes:
+#       - .:/app
+#     tty: true
+#     stdin_open: true
+
+# volumes:
+#   mysql_data:

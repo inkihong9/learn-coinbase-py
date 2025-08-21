@@ -99,6 +99,7 @@ for coin, asset in assets.items():
     if asset.latest_transaction_date < datetime(2025, 1, 1):
         asset.current_fiat_amount = asset.current_coin_amount * float(cb_product.price)
     asset.net_profit = asset.current_fiat_amount - asset.invested_fiat_amount
+    asset.unit_price = float(cb_product.price)
 
 
 # print the dashboard
