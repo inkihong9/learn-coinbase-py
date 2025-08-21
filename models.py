@@ -8,7 +8,6 @@ import uuid
 class RecordType(Enum):
     BUY = "BUY"
     SELL = "SELL"
-    INVEST = "INVEST"
 
 
 class Coin(Enum):
@@ -374,7 +373,10 @@ class Asset:
     current_coin_amount: float
     latest_buy_coin_amount: float
     net_profit: float
+    buy_price: float
+    sell_price: float
     latest_action: RecordType
+    latest_transaction_date: datetime
 
 
     @classmethod
@@ -388,5 +390,8 @@ class Asset:
             current_coin_amount=float(d.get("current_coin_amount", 0)),
             latest_buy_coin_amount=float(d.get("latest_buy_coin_amount", 0)),
             net_profit=float(d.get("net_profit", 0)),
-            latest_action=RecordType(d.get("latest_action", RecordType.INVEST))
+            buy_price=float(d.get("buy_price", 0)),
+            sell_price=float(d.get("sell_price", 0)),
+            latest_action=RecordType(d.get("latest_action", RecordType.BUY)),
+            latest_transaction_date=d.get("latest_transaction_date", datetime.now(timezone.utc))
         )
