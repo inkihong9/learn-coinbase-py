@@ -44,6 +44,7 @@ rest_client = RESTClient(coinbase_api_key, coinbase_api_secret)
 cb_all_accounts = []
 has_next = True
 cursor = None
+skip_cb_accounts = set()
 
 while has_next:
     cb_accounts = rest_client.get_accounts(cursor=cursor)
@@ -74,14 +75,17 @@ for order in reversed(cb_filled_orders.orders):
             asset.current_fiat_amount = record.fiat_amount
             asset.current_coin_amount = 0
             asset.net_profit = asset.latest_sell_fiat_amount - asset.invested_fiat_amount
+            skip_cb_accounts.add(coin_key)
         else:
             asset.current_fiat_amount = 0
             asset.current_coin_amount = record.coin_amount
+            asset.latest_buy_coin_amount = record.coin_amount
+            skip_cb_accounts.remove(coin_key)
 
 # iterate through the watchlist accounts and calculate the remaining values
 for cb_account in cb_watchlist_accounts:
     coin_key = cb_account.currency
-    if coin_key in assets:
+    if coin_key in assets and not skip_cb_accounts.__contains__(coin_key):
         cb_product = cb_products_dict.get(coin_key)
         asset = assets[coin_key]
         asset.current_coin_amount = float(cb_account.available_balance['value']) + float(cb_account.hold['value'])
@@ -106,3 +110,11 @@ for asset in assets.values():
     col8 = f"{asset.net_profit:.2f}".ljust(10, ' ')              # Net Profit
     col9 = asset.latest_action.value.ljust(13, ' ')              # Latest Action
     print(f"{asset.coin.value}  | {col2} | {col3} | {col4} | {col5} | {col6} | {col7} | {col8} | {col9}")
+
+
+# print all account balances
+# print("\n\n\n\nCoin     | Total Balance")
+# for cb_account in cb_all_accounts:
+#     col1 = f"{cb_account.currency}".ljust(8, ' ')
+#     col2 = f"{(float(cb_account.available_balance['value']) + float(cb_account.hold['value']))}"
+#     print(f"{col1} | {col2}")
