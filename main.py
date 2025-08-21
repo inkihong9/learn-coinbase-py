@@ -15,7 +15,6 @@ logging.basicConfig(level=logging.INFO)
 
 records = []
 assets = {}
-coin_keys = { 'XRP': False, 'ETH': False, 'ADA': False, 'DOT': False, 'CRO': False, 'SOL': False }
 
 
 with open('./data/assets.json', 'r') as f:
@@ -36,20 +35,20 @@ with open('./data/records.json', 'r') as f:
             asset.latest_buy_coin_amount = record.coin_amount
             asset.invested_fiat_amount = record.fiat_amount
             asset.latest_transaction_date = record.created_at
+            asset.buy_price = record.order_price
 
 
 coinbase_api_key = os.getenv('COINBASE_API_KEY')
 coinbase_api_secret = os.getenv('COINBASE_API_SECRET')
-
 if not coinbase_api_key or not coinbase_api_secret:
     raise EnvironmentError('Please set the COINBASE_API_KEY and COINBASE_API_SECRET environment variables.')
 
-rest_client = RESTClient(coinbase_api_key, coinbase_api_secret)
 
+rest_client = RESTClient(coinbase_api_key, coinbase_api_secret)
 cb_all_accounts = []
 has_next = True
 cursor = None
-skip_cb_accounts = set()
+
 
 while has_next:
     cb_accounts = rest_client.get_accounts(cursor=cursor)
@@ -102,6 +101,7 @@ for coin, asset in assets.items():
     asset.net_profit = asset.current_fiat_amount - asset.invested_fiat_amount
 
 
+# print the dashboard
 pd(assets)
 print("\n\n")
 pad(assets)
