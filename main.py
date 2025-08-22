@@ -55,16 +55,15 @@ while has_next:
     has_next = cb_accounts.has_next
     if has_next:
         cursor = cb_accounts.cursor
-    
     cb_all_accounts.extend(cb_accounts.accounts)
 
 
-cb_watchlist_accounts = [a for a in cb_all_accounts if a.currency in assets.keys() and a.name.endswith('Wallet')]
-cb_watchlist_accounts_dict = { a.currency: a for a in cb_watchlist_accounts }
+cb_watchlist_accounts_dict = { a.currency: a for a in cb_all_accounts if a.name.endswith('Wallet') }
 cb_filled_orders = rest_client.list_orders(order_status='FILLED', start_date='2025-01-01T00:00:00.000Z')
 cb_filled_orders_dict = { f"{o.product_id.split('-')[0]}-{o.side}": o for o in reversed(cb_filled_orders.orders) }
 cb_products = rest_client.get_products()
 cb_products_dict = { p.product_id.split('-')[0]: p for p in cb_products.products if p.watched }
+usdc_acc = cb_watchlist_accounts_dict.get('USDC')
 
 
 # step 1. iterate through the filled orders in chronological order
@@ -105,4 +104,4 @@ for coin, asset in assets.items():
 # print the dashboard
 pd(assets)
 print("\n\n")
-pad(assets)
+pad(assets, usdc_acc)
