@@ -1,9 +1,6 @@
 # Use official Python 3.13 image
 FROM python:3.13
 
-# Set environment variable
-ENV KEY=value
-
 # Set working directory inside container
 WORKDIR /app
 
