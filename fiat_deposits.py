@@ -1,19 +1,3 @@
-# NOTES:
-# all datetime fields from the response body are in UTC timezone
-# all datetime fields shown in the UI are in the local timezone
-# filter transactions by type: buy, interest
-
-# transaction types:
-# BUY: "buying" USDC crypto with USD fiat
-# SELL: "selling" USDC crypto for USD fiat or any other coin
-# INTEREST: earning interest on USDC crypto holdings
-# ADVANCED_TRADE_FILL: advanced trade fills, but not supported in this script
-# TRADE: maybe this is like converting a coin to another coin?
-# SEND: sending crypto to another wallet, not supported in this script
-# PRO_WITHDRAWAL: not sure what this is
-# PRO_DEPOSIT: not sure what this is
-
-
 import requests
 
 from os import getenv as env
@@ -21,12 +5,17 @@ from cdp.auth.utils.jwt import generate_jwt, JwtOptions
 
 # from coinbase import jwt_generator
 
+USD_ACCOUNT_ID = env('USD_ACCOUNT_ID')
 USDC_ACCOUNT_ID = env('USDC_ACCOUNT_ID')
 
 COINBASE_API_HOST = 'https://api.coinbase.com'
 request_path = f"/v2/accounts/{USDC_ACCOUNT_ID}/transactions"
 
 is_done = False
+
+all_deposits = []
+
+amount = 0
 
 while not is_done:
     jwt_token = generate_jwt(JwtOptions(
@@ -55,6 +44,16 @@ while not is_done:
 
     response_body = response.json()
 
+    deposits = [ t for t in response_body['data'] if t['type'] in ['buy', 'interest'] ]
+    all_deposits.extend(deposits)
+
     request_path = response_body['pagination']['next_uri']
 
     is_done = True if request_path is None else False
+
+for d in all_deposits:
+    native_amount = float(d['native_amount']['amount'])
+    amount += native_amount
+    print(d)
+
+print(f"Total USD Amount from deposits: ${amount:.2f}")
