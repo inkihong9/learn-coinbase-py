@@ -9,4 +9,6 @@
 
 # in case docker-compose.yml is edited
 
-1. still run command `docker compose up --build -d` without having to delete the container, it seems to be updating the old container with the same name
+1. for database, as long as i don't delete the volume, data will persist
+2. need to delete (or rename) the containers first
+3. then run command `docker compose up --build -d`
