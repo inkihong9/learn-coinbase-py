@@ -6,3 +6,7 @@
 4. run command `docker compose up --build -d`
 5. i also need to run `git config --global user.email "my@email.com"`
 6. and run `git config --global user.name "my name"`
+
+# in case docker-compose.yml is edited
+
+1. still run command `docker compose up --build -d` without having to delete the container, it seems to be updating the old container with the same name
