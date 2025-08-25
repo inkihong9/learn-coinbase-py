@@ -1,0 +1,21 @@
+repos:
+  # Secret scanning (GitGuardian)
+  - repo: https://github.com/GitGuardian/ggshield
+    rev: v1.21.0
+    hooks:
+      - id: ggshield
+
+  # Common code hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  # Optional: Python code formatting/linting
+  # - repo: https://github.com/psf/black
+  #   rev: 24.3.0
+  #   hooks:
+  #     - id: black
