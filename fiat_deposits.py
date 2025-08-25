@@ -15,7 +15,8 @@ is_done = False
 
 all_deposits = []
 
-amount = 0
+deposit_amount = 0
+interest_amount = 0
 
 while not is_done:
     jwt_token = generate_jwt(JwtOptions(
@@ -44,7 +45,7 @@ while not is_done:
 
     response_body = response.json()
 
-    deposits = [ t for t in response_body['data'] if t['type'] in ['buy', 'interest'] ]
+    deposits = [ t for t in response_body['data'] if t['type'] in ['buy','interest'] ]
     all_deposits.extend(deposits)
 
     request_path = response_body['pagination']['next_uri']
@@ -53,7 +54,11 @@ while not is_done:
 
 for d in all_deposits:
     native_amount = float(d['native_amount']['amount'])
-    amount += native_amount
+    if d['type'] == 'interest':
+        interest_amount += native_amount
+    elif d['type'] == 'buy':
+        deposit_amount += native_amount
     print(d)
 
-print(f"Total USD Amount from deposits: ${amount:.2f}")
+print(f"Total USD Amount from bank deposits: ${deposit_amount:.2f}")
+print(f"Total USD Amount from interest: ${interest_amount:.2f}")
