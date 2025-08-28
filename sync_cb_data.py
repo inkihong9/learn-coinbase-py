@@ -17,3 +17,5 @@ cb_filled_orders = rest_client.list_orders()
 
 
 print(f"Fetched {len(cb_filled_orders.orders)} filled orders from Coinbase.")
+
+# quick test
