@@ -7,7 +7,7 @@ prints a dashboard of assets with their details
 def print_dashboard(assets: dict):
     print("Coin | Unit Price | Initial Coin Amount | Current Coin Amount | Latest Buy Coin Amount | Buy Price | Invested Amount | Current USD Amount | Latest Sell USD Amount | Sell Price | Net Profit | Latest Action | Latest Transaction Date/Time (UTC)")
     for coin, asset in assets.items():
-        unit_price            = f"{asset.unit_price:.2f}".ljust(10, ' ')                                 # Unit Price
+        unit_price            = f"{asset.unit_price:.4f}".ljust(10, ' ')                                 # Unit Price
         init_coin_amt         = f"{asset.initial_coin_amount:.8f}".ljust(19, ' ')                        # Initial Coin Amount
         curr_coin_amt         = f"{asset.current_coin_amount:.8f}".ljust(19, ' ')                        # Current Coin Amount
         latest_buy_coin_amt   = f"{asset.latest_buy_coin_amount:.8f}".ljust(22, ' ')                     # Latest Buy Coin Amount

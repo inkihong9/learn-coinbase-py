@@ -1,7 +1,7 @@
 # https://github.com/coinbase/coinbase-advanced-py/
 
 # refer to account_sample.json for sample output
-# difference between account.hold vs account.available_balance: account.hold refers to staked asset, 
+# difference between account.hold vs account.available_balance: account.hold refers to staked asset,
 # while account.available_balance refers to amount available for trading or selling
 
 from coinbase.rest import RESTClient
@@ -34,7 +34,7 @@ with open('./data/records.json', 'r') as f:
             asset.initial_coin_amount = record.coin_amount
             asset.latest_buy_coin_amount = record.coin_amount
             asset.invested_fiat_amount = record.fiat_amount
-            asset.latest_transaction_date = record.created_at
+            asset.latest_transaction_dt = record.created_at
             asset.buy_price = record.order_price
 
 
@@ -60,7 +60,6 @@ while has_next:
 
 cb_watchlist_accounts_dict = { a.currency: a for a in cb_all_accounts if a.name.endswith('Wallet') }
 cb_filled_orders = rest_client.list_orders(order_status='FILLED', start_date='2025-01-01T00:00:00.000Z')
-cb_filled_orders_dict = { f"{o.product_id.split('-')[0]}-{o.side}": o for o in reversed(cb_filled_orders.orders) }
 cb_products = rest_client.get_products()
 cb_products_dict = { p.product_id.split('-')[0]: p for p in cb_products.products if p.watched }
 usdc_acc = cb_watchlist_accounts_dict.get('USDC')
@@ -72,7 +71,7 @@ for cb_order in reversed(cb_filled_orders.orders):
     asset = assets.get(coin_key)
     asset.latest_action = RecordType.BUY if cb_order.side == 'BUY' else RecordType.SELL
     asset.order_price = float(cb_order.average_filled_price)
-    asset.latest_transaction_date = datetime.strptime(cb_order.last_fill_time, "%Y-%m-%dT%H:%M:%S.%fZ")
+    asset.latest_transaction_dt = datetime.strptime(cb_order.last_fill_time, "%Y-%m-%dT%H:%M:%S.%fZ")
     if cb_order.side == 'BUY':
         asset.latest_buy_coin_amount = float(cb_order.filled_size)
         asset.buy_price = float(cb_order.average_filled_price)
@@ -95,7 +94,7 @@ for coin, asset in assets.items():
     cb_product = cb_products_dict.get(coin)
     cb_account = cb_watchlist_accounts_dict.get(coin)
     asset.current_coin_amount = float(cb_account.available_balance['value']) + float(cb_account.hold['value'])
-    if asset.latest_transaction_date < datetime(2025, 1, 1):
+    if asset.latest_transaction_dt < datetime(2025, 1, 1):
         asset.current_fiat_amount = asset.current_coin_amount * float(cb_product.price)
     asset.net_profit = asset.current_fiat_amount - asset.invested_fiat_amount
     asset.unit_price = float(cb_product.price)
