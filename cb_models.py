@@ -1,8 +1,9 @@
 from enum import Enum as PyEnum
 from coinbase.rest.types.orders_types import Order
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, Float, Boolean, Text, Enum as SQLEnum
+from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, Text, Enum as SQLEnum
+from sqlalchemy.dialects.mysql import TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime, timezone
+from dateutil import parser
 
 import os
 
@@ -104,7 +105,7 @@ class CbOrder(Base):
     client_order_id = Column(String(36))
     status = Column(SQLEnum(CbOrderStatus))
     time_in_force = Column(SQLEnum(CbTimeInForce))
-    created_time = Column(DateTime)
+    created_time = Column(TIMESTAMP(fsp=6))
     completion_percentage = Column(Float)
     filled_size = Column(Float)
     average_filled_price = Column(Float)
@@ -126,7 +127,7 @@ class CbOrder(Base):
     order_placement_source = Column(SQLEnum(CbOrderPlacementSource))
     outstanding_hold_amount = Column(Float)
     is_liquidation = Column(Boolean)
-    last_fill_time = Column(DateTime)
+    last_fill_time = Column(TIMESTAMP(fsp=6))
     # edit_history = list of some object
     leverage = Column(Text)
     margin_type = Column(SQLEnum(CbMarginType))
@@ -143,39 +144,65 @@ class CbOrder(Base):
         self.order_id = o.order_id
         self.product_id = o.product_id
         self.user_id = o.user_id
-        self.side = o.side
+        self.side = CbOrderSide(o.side)  # Good, assuming o.side is a valid enum value
         self.client_order_id = o.client_order_id
-        self.status = o.status
-        self.time_in_force = o.time_in_force
-        self.created_time = None if o.created_time is None else datetime.strptime(o.created_time, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
-        self.completion_percentage = o.completion_percentage
-        self.filled_size = o.filled_size
-        self.average_filled_price = o.average_filled_price
-        self.number_of_fills = o.number_of_fills
-        self.filled_value = o.filled_value
-        self.pending_cancel = o.pending_cancel
-        self.size_in_quote = o.size_in_quote
-        self.total_fees = o.total_fees
-        self.size_inclusive_of_fees = o.size_inclusive_of_fees
-        self.total_value_after_fees = o.total_value_after_fees
-        self.trigger_status = o.trigger_status
-        self.order_type = o.order_type
-        self.reject_reason = o.reject_reason
-        self.settled = o.settled
-        self.product_type = o.product_type
-        self.reject_message = o.reject_message
-        self.cancel_message = o.cancel_message
-        self.order_placement_source = o.order_placement_source
-        self.outstanding_hold_amount = o.outstanding_hold_amount
-        self.is_liquidation = o.is_liquidation
-        self.last_fill_time = None if o.last_fill_time is None else datetime.strptime(o.last_fill_time, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
-        self.leverage = o.leverage
-        self.margin_type = o.margin_type
-        self.retail_portfolio_id = o.retail_portfolio_id
-        self.originating_order_id = o.originating_order_id
-        self.attached_order_id = o.attached_order_id
-        self.workable_size = o.workable_size
-        self.workable_size_completion_pct = o.workable_size_completion_pct
+        self.status = CbOrderStatus(o.status)  # Good, assuming o.status is a valid enum value
+        self.time_in_force = CbTimeInForce(o.time_in_force)  # Good, assuming o.time_in_force is a valid enum value
+
+        # created_time: Make sure o.created_time is not empty string or None (o.created_time is ALWAYS in UTC timezone)
+        self.created_time = (
+            None if not o.created_time
+            else parser.isoparse(o.created_time)
+        )
+
+        # completion_percentage: Handle empty string or None
+        self.completion_percentage = (
+            float(o.completion_percentage) if o.completion_percentage not in (None, '') else None
+        )
+
+        self.filled_size = float(o.filled_size) if o.filled_size not in (None, '') else None
+        self.average_filled_price = float(o.average_filled_price) if o.average_filled_price not in (None, '') else None
+        self.number_of_fills = int(o.number_of_fills) if o.number_of_fills not in (None, '') else None
+        self.filled_value = float(o.filled_value) if o.filled_value not in (None, '') else None
+
+        # pending_cancel, size_in_quote, size_inclusive_of_fees, settled, is_liquidation: If these can be None, handle accordingly
+        self.pending_cancel = o.pending_cancel if o.pending_cancel is not None else False
+        self.size_in_quote = o.size_in_quote if o.size_in_quote is not None else False
+        self.total_fees = float(o.total_fees) if o.total_fees not in (None, '') else None
+        self.size_inclusive_of_fees = o.size_inclusive_of_fees if o.size_inclusive_of_fees is not None else False
+        self.total_value_after_fees = float(o.total_value_after_fees) if o.total_value_after_fees not in (None, '') else None
+
+        self.trigger_status = CbTriggerStatus(o.trigger_status) if o.trigger_status else None
+
+        # order_type, reject_reason, product_type, order_placement_source, margin_type: If these are enums, wrap as above
+        self.order_type = CbOrderType(o.order_type) if o.order_type else None
+        self.reject_reason = CbRejectReason(o.reject_reason) if o.reject_reason else None
+        self.settled = o.settled if o.settled is not None else False
+        self.product_type = CbProductType(o.product_type) if o.product_type else None
+
+        # reject_message, cancel_message, leverage: If these can be None, handle accordingly
+        self.reject_message = o.reject_message if o.reject_message not in (None, '') else None
+        self.cancel_message = o.cancel_message if o.cancel_message not in (None, '') else None
+        self.order_placement_source = CbOrderPlacementSource(o.order_placement_source) if o.order_placement_source else None
+        self.outstanding_hold_amount = float(o.outstanding_hold_amount) if o.outstanding_hold_amount not in (None, '') else None
+        self.is_liquidation = o.is_liquidation if o.is_liquidation is not None else False
+
+        # last_fill_time: Handle None or empty string (o.last_fill_time is ALWAYS in UTC timezone)
+        self.last_fill_time = (
+            None if not o.last_fill_time
+            else parser.isoparse(o.last_fill_time)
+        )
+
+        self.leverage = o.leverage if o.leverage not in (None, '') else None
+        self.margin_type = CbMarginType(o.margin_type) if o.margin_type else None
+        self.retail_portfolio_id = o.retail_portfolio_id if o.retail_portfolio_id not in (None, '') else None
+        self.originating_order_id = o.originating_order_id if o.originating_order_id not in (None, '') else None
+        self.attached_order_id = o.attached_order_id if o.attached_order_id not in (None, '') else None
+
+        self.workable_size = int(o.workable_size) if o.workable_size not in (None, '') else None
+        self.workable_size_completion_pct = (
+            float(o.workable_size_completion_pct) if o.workable_size_completion_pct not in (None, '') else None
+        )
 
 
 # Create engine
