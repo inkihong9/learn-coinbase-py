@@ -1,5 +1,5 @@
 from coinbase.rest import RESTClient
-from cb_models.cb_order import CbOrder
+from cb_model.cb_order import CbOrder
 from db_conn import SessionLocal
 from sqlalchemy import desc
 from datetime import timedelta

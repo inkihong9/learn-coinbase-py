@@ -4,6 +4,7 @@
 # difference between account.hold vs account.available_balance: account.hold refers to staked asset,
 # while account.available_balance refers to amount available for trading or selling
 
+from client.account_client import get_accounts
 from coinbase.rest import RESTClient
 from models import Record, RecordType, Coin, Asset
 from dashboard import print_dashboard as pd, print_aggregated_dashboard as pad
@@ -15,6 +16,9 @@ logging.basicConfig(level=logging.INFO)
 
 records = []
 assets = {}
+
+
+all_accounts_mine = get_accounts()
 
 
 with open('./data/assets.json', 'r') as f:

@@ -1,4 +1,5 @@
 # NOTES:
+# see https://docs.cdp.coinbase.com/coinbase-app/track-apis/transactions#list-transactions for list transactions REST API details
 # all datetime fields from the response body are in UTC timezone
 # all datetime fields shown in the UI are in the local timezone
 # filter transactions by type: buy, interest
